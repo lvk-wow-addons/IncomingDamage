@@ -1,4 +1,4 @@
-## Interface: 70300
+## Interface: 80200
 ## Title: IncomingDamage
 ## Notes: 
 ## Author: Lasse Vågsæther Karlsen
