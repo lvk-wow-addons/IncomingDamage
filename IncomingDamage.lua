@@ -19,7 +19,7 @@ local stats = {
 local queue = {}
 local frame = CreateFrame("FRAME", "IncomingDamageAddonFrame");
 frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
-local function eventHandler(self, e, timestamp, subEvent, ...)
+local function eventHandler(self)
     function getDmgTypeId(schoolId)
         if schoolId == 1 then
             return 1   -- Physical
@@ -31,18 +31,22 @@ local function eventHandler(self, e, timestamp, subEvent, ...)
         return -schoolId
     end
 
-    if select(6, ...) ~= UnitGUID("player") or not subEvent:find("_DAMAGE") or subEvent:find("ENVIRONMENTAL") then
+    local timestamp, subEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags, extraArg1, extraArg2, extraArg3, extraArg4, extraArg5, extraArg6, extraArg7, extraArg8, extraArg9, extraArg10 = CombatLogGetCurrentEventInfo()
+
+    if destGUID ~= UnitGUID("player") or not subEvent:find("_DAMAGE") or subEvent:find("ENVIRONMENTAL") then
         return false
     end
 
     local amountIndex = 10
-    if subEvent:find("SPELL_") or subEvent:find("RANGE_") then
-        amountIndex = amountIndex + 3
-    end
 
     local dmgTime = GetTime()
-    local dmgTypeId = getDmgTypeId(select(12, ...))
-    local amount = select(amountIndex, ...)
+    local dmgTypeId = getDmgTypeId(extraArg3)
+    local amount = 0
+    if subEvent:find("SPELL_") or subEvent:find("RANGE_") then
+        amount = extraArg1
+    else
+        amount = extraArg4
+    end
     if not amount or type(amount) ~= "number" then
         return
     end
