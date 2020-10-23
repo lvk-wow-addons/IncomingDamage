@@ -1,15 +1,3 @@
-function IncomingDamage_ChatPrint(str)
-	DEFAULT_CHAT_FRAME:AddMessage("[MyMount] "..str, 0.25, 1.0, 0.25)
-end
-
-function IncomingDamage_ErrorPrint(str)
-	DEFAULT_CHAT_FRAME:AddMessage("[MyMount] "..str, 1.0, 0.5, 0.5)
-end
-
-function IncomingDamage_DebugPrint(str)
-	DEFAULT_CHAT_FRAME:AddMessage("[MyMount] "..str, 0.75, 1.0, 0.25)
-end
-
 local stats = {
     totalMagicalDamage = 0,
     totalPhysicalDamage = 0,
@@ -23,7 +11,7 @@ local function eventHandler(self)
     function getDmgTypeId(schoolId)
         if schoolId == 1 then
             return 1   -- Physical
-        elseif schoolId % 2 >= 1 then
+        elseif schoolId == 124 or schoolId == 127 then
             return 2 -- Chaos
         else
             return 3 -- Magic
@@ -42,10 +30,13 @@ local function eventHandler(self)
     local dmgTime = GetTime()
     local dmgTypeId = getDmgTypeId(extraArg3)
     local amount = 0
+    if LVK.DEBUG_ENABLED then
+        LVK.DebugPrint(subEvent .. ": " .. tostring(extraArg1) .. ", " .. tostring(extraArg2) .. ", " .. tostring(extraArg3) .. ", " .. tostring(extraArg4))
+    end
     if subEvent:find("SPELL_") or subEvent:find("RANGE_") then
-        amount = extraArg1
-    else
         amount = extraArg4
+    else
+        amount = extraArg1
     end
     if not amount or type(amount) ~= "number" then
         return
@@ -94,11 +85,16 @@ end
 function IncomingDamage_AdjustDamage(dmgTypeId, amount)
     if dmgTypeId == 1 then
         stats.totalPhysicalDamage = stats.totalPhysicalDamage + amount
+        LVK:Debug("physical: " .. tostring(amount))
     elseif dmgTypeId == 2 then
         stats.totalChaosDamage = stats.totalChaosDamage + amount
+        LVK:Debug("chaos: " .. tostring(amount))
     elseif dmgTypeId == 3 then
         stats.totalMagicalDamage = stats.totalMagicalDamage + amount
+        LVK:Debug("magical: " .. tostring(amount))
     end
 
     stats.totalDamage = stats.totalDamage + amount
 end
+
+LVK:AnnounceAddon("IncomingDamage");

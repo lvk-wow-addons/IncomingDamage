@@ -1,7 +1,8 @@
-## Interface: 80200
+## Interface: 90001
 ## Title: IncomingDamage
 ## Notes: 
 ## Author: Lasse Vågsæther Karlsen
 ## Version: 0.10.0
 ## DefaultState: Enabled
+## Dependencies: LVK
 IncomingDamage.lua
