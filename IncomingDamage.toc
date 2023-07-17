@@ -1,4 +1,4 @@
-## Interface: 90001
+## Interface: 100105
 ## Title: IncomingDamage
 ## Notes: 
 ## Author: Lasse Vågsæther Karlsen

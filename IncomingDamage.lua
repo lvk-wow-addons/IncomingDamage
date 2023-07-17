@@ -5,6 +5,7 @@ local stats = {
     totalDamage = 0
 }
 local queue = {}
+local isSimulating = False
 local frame = CreateFrame("FRAME", "IncomingDamageAddonFrame");
 frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
 local function eventHandler(self)
@@ -55,6 +56,19 @@ function IncomingDamage_TotalMagicalDamage()
     return stats.totalMagicalDamage
 end
 
+function IncomingDamage_Simulate(physical, magical, chaos)
+    isSimulating = True
+    stats.totalMagicalDamage = magical
+    stats.totalPhysicalDamage = physical
+    stats.totalChaosDamage = chaos
+    stats.totalDamage = physical + magical + chaos
+end
+
+function IncomingDamage_GetStats()
+    IncomingDamage_CleanupQueue()
+    return stats
+end
+
 function IncomingDamage_TotalPhysicalDamage()
     IncomingDamage_CleanupQueue()
     return stats.totalPhysicalDamage
@@ -83,6 +97,10 @@ function IncomingDamage_CleanupQueue()
 end
 
 function IncomingDamage_AdjustDamage(dmgTypeId, amount)
+    if isSimulating then
+        return
+    end
+
     if dmgTypeId == 1 then
         stats.totalPhysicalDamage = stats.totalPhysicalDamage + amount
         LVK:Debug("physical: " .. tostring(amount))
